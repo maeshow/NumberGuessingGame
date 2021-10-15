@@ -1,46 +1,90 @@
-import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
 public class App {
+    private static final Scanner STDIN = new Scanner(System.in);
+
     private static final int MAX_RANDOM_NUMBER_AMOUNT = 100;
     private static final int RESPONSE_LIMIT = 5;
+    private static final int START_COUNT = 1;
 
     public static void main(String[] args) throws Exception {
-        Random random = new Random();
-        int randomNumber = random.nextInt(MAX_RANDOM_NUMBER_AMOUNT);
+        int randomNumber = getRandomNum(MAX_RANDOM_NUMBER_AMOUNT);
 
-        System.out.println(Messages.GAME_DESCRIPTION);
-        System.out.println();
-        System.out.printf(Messages.ANSWER_LIMIT_DESCRIPTION, RESPONSE_LIMIT);
-        System.out.println();
+        showMessageWithNewLine(Messages.GAME_DESCRIPTION);
+        showNewLine();
+        showFormattedMessage(Messages.ANSWER_LIMIT_DESCRIPTION, RESPONSE_LIMIT);
+        showNewLine();
 
-        try {
-            boolean isComplete = false;
-            Scanner scanner = new Scanner(System.in);
-            for (int i = 0; i < RESPONSE_LIMIT; i++) {
-                System.out.printf(Messages.ANSWER_COUNT, i + 1);
-                Integer inputNumber = scanner.nextInt();
+        int count = START_COUNT;
+        boolean isComplete = false;
+        while (isResponseLimitRange(count)) {
+            int inputNumber = getPlayerInput(count);
 
-                if (randomNumber == inputNumber) {
-                    System.out.printf(Messages.COMPLETE_GAME, i + 1);
-                    isComplete = true;
-                    break;
-                } else if (randomNumber > inputNumber) {
-                    System.out.println(Messages.BIGGER_TIPS);
-                } else if (randomNumber < inputNumber) {
-                    System.out.println(Messages.SMALLER_TIPS);
-                }
+            if (isEqualNumber(randomNumber, inputNumber)) {
+                showFormattedMessage(Messages.COMPLETE_GAME, count);
+                isComplete = true;
+                break;
             }
-
-            if (!isComplete) {
-                System.out.printf(Messages.GAME_OVER, randomNumber);
+            if (isBigger(randomNumber, inputNumber)) {
+                showMessageWithNewLine(Messages.BIGGER_TIPS);
+                showNewLine();
+            } else {
+                showMessageWithNewLine(Messages.SMALLER_TIPS);
+                showNewLine();
             }
-
-            scanner.close();
-
-        } catch (InputMismatchException e) {
-            System.out.println(Messages.ENTER_NUMBER_WARN);
+            count++;
         }
+
+        if (!isComplete) {
+            showFormattedMessage(Messages.GAME_OVER, randomNumber);
+        }
+
+        STDIN.close();
+    }
+
+    private static int getRandomNum(int maxNumberAmount) {
+        Random random = new Random();
+        return random.nextInt(maxNumberAmount);
+    }
+
+    private static int getPlayerInput(int count) {
+        try {
+            showFormattedMessage(Messages.ANSWER_COUNT, count);
+            String input = STDIN.next();
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            showMessageWithNewLine(Messages.ENTER_NUMBER_WARN);
+            showNewLine();
+            return getPlayerInput(count);
+        }
+    }
+
+    private static boolean isResponseLimitRange(int count) {
+        return count <= RESPONSE_LIMIT;
+    }
+
+    private static boolean isEqualNumber(int number1, int number2) {
+        return number1 == number2;
+    }
+
+    private static boolean isBigger(int number1, int number2) {
+        return number1 > number2;
+    }
+
+    private static void showMessageWithNewLine(String message) {
+        System.out.println(message);
+    }
+
+    private static void showMessageWithoutNewLine(String message) {
+        System.out.printf(message);
+    }
+
+    private static void showNewLine() {
+        System.out.println();
+    }
+
+    private static void showFormattedMessage(String message, int number) {
+        System.out.format(message, number);
     }
 }
