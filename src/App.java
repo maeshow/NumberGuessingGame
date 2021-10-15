@@ -4,9 +4,10 @@ import java.util.Scanner;
 public class App {
     private static final Scanner STDIN = new Scanner(System.in);
 
-    private static final int MAX_RANDOM_NUMBER_AMOUNT = 100;
-    private static final int RESPONSE_LIMIT = 5;
+    private static final int MAX_RANDOM_NUMBER_AMOUNT = 1000;
+    private static final int RESPONSE_LIMIT = 10;
     private static final int START_COUNT = 1;
+    private static final int DISTANCE_UNIT = 10;
 
     public static void main(String[] args) throws Exception {
         int randomNumber = getRandomNum(MAX_RANDOM_NUMBER_AMOUNT);
@@ -28,9 +29,14 @@ public class App {
             }
             if (isBigger(randomNumber, inputNumber)) {
                 showMessageWithNewLine(Messages.BIGGER_TIPS);
-                showNewLine();
             } else {
                 showMessageWithNewLine(Messages.SMALLER_TIPS);
+            }
+            if (isAway(randomNumber, inputNumber)) {
+                showFormattedMessage(Messages.AWAY_TIPS, DISTANCE_UNIT);
+                showNewLine();
+            } else {
+                showFormattedMessage(Messages.NEAREST_TIPS, DISTANCE_UNIT);
                 showNewLine();
             }
             count++;
@@ -72,12 +78,13 @@ public class App {
         return number1 > number2;
     }
 
-    private static void showMessageWithNewLine(String message) {
-        System.out.println(message);
+    private static boolean isAway(int number1, int number2) {
+        int distance = Math.abs(number1 - number2);
+        return distance >= DISTANCE_UNIT;
     }
 
-    private static void showMessageWithoutNewLine(String message) {
-        System.out.printf(message);
+    private static void showMessageWithNewLine(String message) {
+        System.out.println(message);
     }
 
     private static void showNewLine() {
